@@ -1,5 +1,15 @@
 #!/usr/bin/perl
 
+# scrapes data from NRO webpage
+# takes input from stdin
+# outputs JSON to stdout
+# JSON format is {$department:$coursenumber,...}
+# some departments don't let you NRO any courses,
+# in this case output will be $department:"all"
+
+
+
+
 $flag = 0;
 
 while (<>) {
