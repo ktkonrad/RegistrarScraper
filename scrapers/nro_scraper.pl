@@ -28,8 +28,15 @@ while (<>) {
     if (/NON-RECORDING OPTION OUT-OF-BOUNDS/) {
 	$flag = 1;
     }
+ 
     if (/<p>([a-zA-Z ']+)((: All courses)|( [\d,\w\(\) ]+))<\/p>/ && $flag) {
-	$output = $output . parseCourseNumList($1, $2) . ", ";
+	$dept = uc $1;
+	$dept = `../utils/dept_abbrev.pl '$dept'`;
+	chomp($dept);
+
+	if ($dept) {
+	    $output = $output . parseCourseNumList($dept, $2) . ", ";
+	}
     }
 }
 
