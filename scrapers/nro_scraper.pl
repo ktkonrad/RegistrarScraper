@@ -3,9 +3,20 @@
 # scrapes data from NRO webpage
 # takes input from stdin
 # outputs JSON to stdout
-# JSON format is {$department:$coursenumber,...}
+# JSON format is
+# {
+#   [
+#     {
+#       "department" : $department,
+#       "courses": [
+#         $coursenumber1,
+#         ...
+#       ]
+#     }
+#   ]
+# }
 # some departments don't let you NRO any courses,
-# in this case output will be $department:"all"
+# in this case output will be "courses": "all"
 
 
 
@@ -18,25 +29,28 @@ while (<>) {
 	$flag = 1;
     }
     if (/<p>([a-zA-Z ']+)((: All courses)|( [\d,\w\(\) ]+))<\/p>/ && $flag) {
-	$output = $output . parseCourseNumList($1, $2);
+	$output = $output . parseCourseNumList($1, $2) . ", ";
     }
 }
 
 sub parseCourseNumList() {
     my ($dept, $nums) = @_;
-    my $out = "";
     
     if ($nums =~ "All courses") {
-	return "\"$dept\":\"all\",";
+	return "{\"department\": \"$dept\", \"courses\": \"all\"}";
     }
+
+    my $out = "{\"department\": \"$dept\", \"courses\": [";
 
     while ($nums =~ /(\d+)([\(\)\w\d, ]*)/) {
-	$out = $out . "\"$dept\":$1,";
+	$out = $out . "$1, ";
 	$nums = $2;
     }
-    return $out;
+
+    chop $out; chop $out; # delete extra comma and space on the end
+    return $out . "]}";
 }
 
-chop $output; # there's an extra comma on the end
+chop $output; chop $output; # delete extra comma and space on the end
 
-print "{$output}\n";
+print "{[$output]}\n";
